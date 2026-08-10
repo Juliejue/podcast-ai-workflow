@@ -1,0 +1,42 @@
+{
+  "ep_low": {
+    "播放": 120,
+    "点赞": 5,
+    "收藏": 3,
+    "分享": 2,
+    "完播率": 0.42,
+    "平均播放时长": "02:10",
+    "chapters": [
+      ["00:00", "Why small projects stall"],
+      ["01:20", "Make the first step smaller"],
+      ["03:10", "Review for information"]
+    ]
+  },
+  "ep_mid": {
+    "播放": 135,
+    "点赞": 9,
+    "收藏": 5,
+    "分享": 4,
+    "完播率": 0.61,
+    "平均播放时长": "03:45",
+    "chapters": [
+      ["00:00", "Name the change"],
+      ["01:20", "Shrink the first step"],
+      ["03:10", "Use feedback as a map"]
+    ]
+  },
+  "ep_high": {
+    "播放": 110,
+    "点赞": 14,
+    "收藏": 8,
+    "分享": 7,
+    "完播率": 0.84,
+    "平均播放时长": "04:05",
+    "chapters": [
+      ["00:00", "A concrete promise"],
+      ["01:20", "A smaller first step"],
+      ["03:10", "Turn feedback into direction"],
+      ["04:10", "Three takeaways"]
+    ]
+  }
+}

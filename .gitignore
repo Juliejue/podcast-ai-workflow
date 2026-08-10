@@ -1,0 +1,36 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.env.*
+
+# 私有节目配置：公开仓库只保留 example
+config.json
+glossary.json
+
+# 原始媒体永远不进仓库
+*.mp3
+*.wav
+*.m4a
+*.aac
+*.flac
+*.mp4
+*.mov
+*.mkv
+
+# 私人逐字稿与运行产物默认忽略；匿名 demo 明确放行
+**/*_转写*.txt
+**/*_转写*.srt
+**/*_剪辑对比*.md
+**/*_ShowNotes素材*.md
+**/*_切片候选*.md
+跨期剪辑复盘.md
+performance_data.json
+!demo/*_转写*.txt
+!demo/*_转写*.srt
+!demo/*_剪辑对比*.md
+!demo/*_ShowNotes素材*.md
+!demo/*_切片候选*.md
+!demo/**

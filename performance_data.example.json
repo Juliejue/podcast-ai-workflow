@@ -1,0 +1,54 @@
+{
+  "ep02": {
+    "播放": 120,
+    "点赞": 8,
+    "收藏": 5,
+    "分享": 4,
+    "完播率": 0.43,
+    "平均播放时长": "31:20",
+    "speaker_a": "Host A",
+    "raw_audio": "episodes/ep02/raw.mp4",
+    "final_audio": "episodes/ep02/final.mp3",
+    "chapters": [
+      ["00:00", "Opening question"],
+      ["04:20", "First story"],
+      ["12:10", "What changed"],
+      ["24:30", "Takeaways"]
+    ]
+  },
+  "ep03": {
+    "播放": 138,
+    "点赞": 11,
+    "收藏": 7,
+    "分享": 6,
+    "完播率": 0.61,
+    "平均播放时长": "42:15",
+    "speaker_a": "Host A",
+    "raw_audio": "episodes/ep03/raw.mp4",
+    "final_audio": "episodes/ep03/final.mp3",
+    "chapters": [
+      ["00:00", "Cold open"],
+      ["03:40", "The central conflict"],
+      ["18:00", "A concrete example"],
+      ["35:20", "Closing reflection"]
+    ]
+  },
+  "ep04": {
+    "播放": 105,
+    "点赞": 15,
+    "收藏": 9,
+    "分享": 7,
+    "完播率": 0.82,
+    "平均播放时长": "48:05",
+    "speaker_a": "Host A",
+    "raw_audio": "episodes/ep04/raw.mp4",
+    "final_audio": "episodes/ep04/final.mp3",
+    "chapters": [
+      ["00:00", "The promise"],
+      ["05:10", "Personal experience"],
+      ["17:45", "Turning point"],
+      ["33:30", "A new framing"],
+      ["46:00", "One thing to try"]
+    ]
+  }
+}
