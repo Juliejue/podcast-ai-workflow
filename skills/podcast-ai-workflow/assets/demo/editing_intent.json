@@ -1,0 +1,18 @@
+{
+  "episode_question": "为什么小项目总是开始得很热闹，后来却停了",
+  "listener_takeaway": "带走一个今天就能做的小动作",
+  "lead_host": "Host A",
+  "desired_feeling": "保留试错和转弯时的真实感",
+  "must_keep": [
+    {
+      "label": "主持人指定保留的生活细节",
+      "start": "02:24",
+      "end": "03:00",
+      "reason": "测试创作意图能否覆盖通用剪辑判断"
+    }
+  ],
+  "protected_keywords": ["买咖啡"],
+  "signature_digressions": ["偶尔保留一个看似偏题、但能显出人物的生活细节"],
+  "known_cuttable": ["设备检查", "正式结束后的确认"],
+  "experiment": "同一个观点只保留最具体的一版"
+}

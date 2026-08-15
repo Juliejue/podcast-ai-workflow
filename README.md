@@ -1,16 +1,23 @@
 # Podcast AI Workflow
 
-一套给非技术播客主理人使用的本地工作流，覆盖：
+一个可安装的 Codex Skill，把播客从录音结束后的零散工作连成完整流程：
 
-**录音结束 → 剪前/剪后转写 → 数据辅助剪辑复盘 → 新一期 Show Notes / 短视频候选**
+**原始录音 / 成片转写 → 跨期剪辑学习 → 本期粗剪护栏 → 风格化 Show Notes / 切片候选**
 
-它不是三个互不相关的小工具。第一段建立可比对的数据，第二段从历史高低表现期提炼下一期的剪辑假设，第三段只服务之后的新内容。三段共享同一份成片时间轴，同时把“该删什么、该发什么”的最终判断留给人。
+最核心的两个结果是：
 
-## 作为 Codex Skill 一键安装
+- 一张有证据、有反方理由、有风险等级的剪辑护栏卡，帮助主播回听和判断，不替主播删音频；
+- 一套只读取成片、遵守节目固定语气、能自动检查时间点和语言禁区的 Show Notes 流程。
+
+所有真实音频和逐字稿都留在使用者自己的电脑里。公开仓库只包含代码、配置示例与人工编写的匿名 demo。
+
+## 一键安装
 
 在 Codex 中直接说：
 
-> 请安装这个 Skill：https://github.com/Juliejue/podcast-ai-workflow/tree/main/skills/podcast-ai-workflow
+```text
+请安装这个 Skill：https://github.com/Juliejue/podcast-ai-workflow/tree/main/skills/podcast-ai-workflow
+```
 
 也可以使用 Codex 自带的安装器：
 
@@ -20,116 +27,114 @@ python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-githu
   --path skills/podcast-ai-workflow
 ```
 
-安装后，在下一轮对话中使用：
+安装后重新开始一轮对话，再说：
 
 ```text
-用 $podcast-ai-workflow 处理这个播客文件夹：先检查现有素材，再做剪前/剪后转写、剪辑复盘或成片宣发。
+用 $podcast-ai-workflow 检查这个播客文件夹。先告诉我现有素材能完成哪一步，再继续执行。
 ```
 
-Skill 会先检查环境。逐字稿对比和宣发只需要 Python 3.10+；本地转写和声波指标需要额外依赖。安装依赖和首次下载 Whisper 模型前，它会先征求同意。私有音频、逐字稿和配置始终留在使用者自己的工作区，不需要复制到 Skill 安装目录。
+## 先看结果
 
-## 为什么做
+- [匿名剪辑护栏卡](skills/podcast-ai-workflow/assets/demo/demo_剪辑护栏卡.md)
+- [匿名 Show Notes 成稿](skills/podcast-ai-workflow/assets/demo/demo_ShowNotes成稿.md)
+- [三分钟展示稿](DEMO.md)
 
-项目从三个连续需求长出来：
+匿名 demo 可以直接试：
 
-1. 主理人需要同时拿到原始录音和剪辑成片的带时间轴逐字稿；
-2. 高完播单集出现后，需要知道它删了什么、保留了什么，以及低表现期下一次怎么剪；
-3. 新一期发布前，需要基于成片自动准备 Show Notes 和短视频候选。
-
-两位主播轮流剪辑时，原始录音、成片、SRT 和本地转写的命名与格式并不一致。最常见的两个宣发错误是：
-
-- 时间点来自原始录音，发布时对不上成片；
-- 文案引用了已经删掉的内容。
-
-这套工具把可机械验证的部分固定下来：成片物料只读成片稿；剪辑复盘把转写差异、平台表现、声波和双人对话节奏放进同一张表，但不把小样本相关性写成因果。
-
-## 三个工具
-
-### 1. 剪前 / 剪后本地转写（来自使用者的首个需求）
-
-```bash
-python3 tools/transcribe.py episodes/ep05/audio.mp3
-python3 tools/transcribe.py episodes/ep05/raw.mp4 --原始
+```text
+用 $podcast-ai-workflow 处理仓库里的匿名 demo：生成粗剪护栏卡，解释为什么“买咖啡”片段被保护；再校验 demo Show Notes。不要安装转写模型。
 ```
 
-第一次在原始录音上加 `--原始`，得到剪前逐字稿；剪辑完成后再对成片运行一次，得到发布版本逐字稿。基于 `faster-whisper`，同时生成带时间戳 TXT 与可导入剪辑软件的 SRT。`--试跑` 只处理前三分钟；`--模型` 可选 `small`、`medium`、`large-v3`。
+## 三个组成部分
 
-### 2. 数据辅助剪辑复盘（核心需求）
+### 1. 原始录音与成片双转写
 
-```bash
-python3 tools/compare_edits.py episodes/ep05
+使用者先交付原始录音，得到带时间轴 TXT 和 SRT。完成剪辑后再交付成片，得到第二份同格式转写稿。两份稿子建立了后续复盘的共同时间轴。
+
+本地转写基于 `faster-whisper`。支持前三分钟试跑、术语表和多档模型；已有输出会自动保留版本，不覆盖原文件。
+
+### 2. 跨期剪辑学习与本期粗剪护栏
+
+这部分分成两个时间点：
+
+| 何时使用 | 输入 | 输出 | 服务谁 |
+|---|---|---|---|
+| 历史单集积累到表现数据以后 | 多期原始稿、成片稿、手动填写的完播率等 | 跨期剪辑复盘 | 指导下一期的一个可验证实验 |
+| 本期完成第一轮粗剪以后 | 本期原始稿、粗剪稿、创作意图、可选历史复盘 | 剪辑护栏卡 | 指导本期最终回听和二剪 |
+
+跨期复盘会比较删减位置、板块时长、文字密度、话题移动、停顿、声波和双人接话等可获得维度。它会明确区分相关性与因果，不把一两期数据包装成流量规律。
+
+粗剪护栏卡先读取主播写下的本期问题、听众收获、主叙事者、想保留的感受、受保护片段和一个实验，再对照粗剪前后的差异。每个候选必须同时显示：
+
+- 原始时间与原文证据；
+- 片段在本期可能承担的功能；
+- 考虑缩短的理由；
+- 考虑保留的理由；
+- 证据来源、风险与置信度；
+- 留空的人工决定。
+
+绿色只用于明显制作残留或完全重复的录制；黄色必须结合上下文；红色来自创作意图保护，工具不提供删除选项。主播的明确意图优先于历史高表现期的通用规律。
+
+### 3. 风格化 Show Notes 与切片候选
+
+这一步只在新一期成片确认后运行，而且只读取成片逐字稿。
+
+Skill 会生成章节时间点、Show Notes 写作素材和小红书切片候选，再用《稳稳接住》的固定风格完成成稿。风格指南包括具体场景开篇、情绪与内在冲突、固定栏目、固定节目介绍和同名小红书关注提示。
+
+这里有两道边界。素材生成只读取成片稿，避免把原始稿已经删除的内容带进文案；最终校验会拦截：
+
+- 不在成片逐字稿里的时间点；
+- 缺失的固定栏目或小红书提示；
+- 破折号；
+- “不是 A，而是 B”式的人工金句；
+
+语言校验能守住硬边界，最终语气和发布决定仍需要主播确认。
+
+## 工作周期
+
+```text
+录音完成
+  ↓
+原始转写
+  ↓
+人工粗剪 → 剪辑护栏卡 → 人工回听与二剪
+  ↓
+成片转写 → Show Notes / 切片候选 → 风格与时间点校验
+  ↓
+发布并等待表现数据
+  ↓
+跨期复盘 → 下一期只验证一个新实验
 ```
 
-支持本工具的时间戳 TXT、已有 SRT，以及 `说话人(00:12:34): 正文` 形式的会议转写：
+## 独立命令示例
+
+### 跨期复盘
 
 ```bash
-python3 tools/compare_edits.py episodes/ep05 --原始稿 raw-export.srt
-```
-
-算法先把两份稿子连成全文，再按字符顺序对齐，最后映射回原始时间轴。它不依赖两边使用同一种转写工具，也不要求切句一致。单集报告包含：
-
-- 真实时长差与逐字对齐率；
-- 疑似删除候选、原始时间点、置信度；
-- 删除集中在前、中、后哪一段；
-- 最长候选的原文，供人工回听。
-
-更重要的是跨期模式。把历史高、低完播单集放在一起：
-
-```bash
-cp performance_data.example.json performance_data.json
-python3 tools/compare_edits.py episodes/ep02 episodes/ep03 episodes/ep04 \
+python3 skills/podcast-ai-workflow/scripts/compare_edits.py \
+  episodes/ep02 episodes/ep03 episodes/ep04 \
   --汇总 --表现数据 performance_data.json
 ```
 
-`performance_data.json` 可填播放、完播率、平均播放时长、原始/成片媒体路径、说话人 A 和发布章节。报告会生成一张跨期表，覆盖：
-
-- 剪前/剪后时长、文字删除率、长段删减和删减位置；
-- 框架、章节数量、每个板块停留时间、话题切换密度；
-- 文字密度、静默占比、长停顿、动态范围和频谱异常；
-- 接话频率、轮流接话率、单次发言时长、长发言数量和双方文字占比；
-- 高完播样本删了什么、保留了什么，以及低表现期下一次可验证的剪辑假设。
-
-声波只说明“剪得多紧、音量是否异常”，不能代表内容质量；平台样本小时，报告会明确把结论标成工作假设，而不是因果证明。
-
-会议转写里一段可能长达一分钟；脚本会先按标点细分，再按字数在相邻时间点之间插值。
-文字候选总时长不必等于音频时长差：静默、停顿和语速变化会被单独列为“未由文字候选解释”。
-
-### 3. 新一期宣发物料（辅助需求）
+### 粗剪护栏卡
 
 ```bash
-python3 tools/promo_materials.py episodes/ep05
+python3 skills/podcast-ai-workflow/scripts/editing_guardrails.py episodes/ep05 \
+  --原始稿 raw-transcript.txt \
+  --粗剪稿 rough-cut-transcript.txt \
+  --创作意图 editing_intent.json \
+  --历史复盘 cross-episode-editing-review.md
 ```
 
-只在未来的新一期完成剪辑后运行，历史分析期不需要重新生成宣发。它生成 Show Notes 初稿和短视频候选，只读取成片稿，并在输出里写明来源文件；候选的起止点必须是成片稿已有的时间戳。片段边界会标记为“完整”或“需回听”，两条候选之间至少保留 20 秒。
-
-脚本不调用付费 API。输出附带可复制到任意大模型的 prompt，但标题、排序和发布决定仍由人完成。
-
-## 作为独立命令行工具安装
-
-需要 Python 3.10+。
+### Show Notes 素材与校验
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp config.example.json config.json
-cp glossary.example.json glossary.json
+python3 skills/podcast-ai-workflow/scripts/promo_materials.py episodes/ep05 \
+  --成片稿 final-transcript.txt
+
+python3 skills/podcast-ai-workflow/scripts/validate_show_notes.py ShowNotes成稿.md \
+  --成片稿 episodes/ep05/final-transcript.txt
 ```
-
-在 `config.json` 填节目名、主播、主题和目标听众；在 `glossary.json` 增补人名、专有词和固定句式。
-
-## 匿名演示
-
-`demo/` 是人工编写的匿名素材，不来自真实节目。可以直接运行单集与跨期流程：
-
-```bash
-python3 tools/compare_edits.py demo
-python3 tools/promo_materials.py demo
-python3 tools/compare_edits.py demo/ep_low demo/ep_mid demo/ep_high \
-  --汇总 --表现数据 demo/performance_data.json
-```
-
-仓库保留对应输出，包括 `demo/demo_跨期剪辑复盘.md`，方便不安装转写模型时直接查看结果。
 
 ## 验证
 
@@ -137,37 +142,14 @@ python3 tools/compare_edits.py demo/ep_low demo/ep_mid demo/ep_high \
 python3 -m unittest discover -s tests -v
 ```
 
-测试会检查：
+当前自动化测试覆盖：不同转写切句的对齐、摘要误用拦截、原始稿独有内容隔离、跨期输出、受保护片段、三档风险、固定 Show Notes 风格、禁用语言和成片时间点校验。
 
-- 不同切句方式仍能对齐；
-- 摘要型文件会被拒绝，不能冒充带时间轴逐字稿；
-- 每个切片的起止点都来自成片稿；
-- 每段候选文字都是成片稿连续片段；
-- 原始稿独有的录前、录后内容不会进入宣发输出；
-- 章节停留时间和指定说话人 A 的统计保持稳定。
+## 重要边界
 
-真实项目回归覆盖三组带说话人时间轴的原始稿（公开仓库不含逐字稿或音频）：84:38 → 32:23、77:27 → 57:39、119:26 → 52:35。最高表现样本识别出 38 个候选，并把录前准备、录后复盘、重复追问和支线展开分别定位；低文字删减样本只有约 6% 文本表现为整段删除，其余时长差保留为停顿、语速或转写差异，避免把音频压缩误写成内容删减。
-
-## 数据与隐私
-
-`.gitignore` 默认排除：
-
-- 音频、视频；
-- 私人逐字稿和运行产物；
-- `.env`、`config.json`、`glossary.json`；
-- Python 缓存。
-
-公开仓库只应提交代码、示例配置和匿名 demo。运行前仍建议执行一次敏感信息扫描。
-
-## 已知边界
-
-- 双人配合指标需要原始稿使用 `说话人(HH:MM:SS): 正文` 格式；成片说话比例是文字对齐估算。单声道混音更适合从录制端改成分轨。
-- 转写差异会造成少量剪辑对比误报，因此报告使用“疑似删除候选”。
-- 章节标题可以来自发布清单；自动章节边界基于停顿，不理解主题语义。
-- 术语表不能安全修正“把一个真实主播名听成另一位真实主播名”的歧义。
-- 播放量、完播率、标题、主题和流量来源可能共同影响结果；工具不判断某次删除“导致”了完播提升。
-- 工具不修改音频，不替人决定该删、该留或该发布什么。
-
-## 案例
+- 平台数据需要使用者手动填写，Skill 不抓取私有小宇宙后台。
+- 声波指标只能描述节奏、静默和音量特征，不能判断内容质量。
+- 转写差异可能带来少量对比误报，所以输出使用“疑似删除候选”。
+- 单声道混音无法可靠还原精确分轨；双人接话指标依赖带说话人时间轴的原始稿。
+- Skill 不修改音频，不自动删除，不保证完播率或流量增长。
 
 完整产品案例：[heyjue.com/podcast-delivery.html](https://heyjue.com/podcast-delivery.html)

@@ -1,0 +1,25 @@
+{
+  "episode_question": "这一期最想回答的一个问题",
+  "listener_takeaway": "听完以后，希望听众感受到或带走什么",
+  "lead_host": "本期主要承担叙事的主播",
+  "desired_feeling": "本期希望保留的情绪和呼吸感",
+  "must_keep": [
+    {
+      "label": "必须保留的关键时刻",
+      "start": "12:30",
+      "end": "15:00",
+      "reason": "它承担本期最重要的情绪转折"
+    }
+  ],
+  "protected_keywords": [
+    "希望保留的原话或关键词"
+  ],
+  "signature_digressions": [
+    "哪些发散属于节目风格，不能仅凭偏离主线判定为冗余"
+  ],
+  "known_cuttable": [
+    "录前设备沟通",
+    "正式结束后的运营复盘"
+  ],
+  "experiment": "这一期只验证的一个剪辑假设"
+}

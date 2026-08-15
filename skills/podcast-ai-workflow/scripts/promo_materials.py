@@ -28,6 +28,9 @@ from pathlib import Path
 
 from transcribe import apply_glossary, load_config, load_glossary
 
+SCRIPT_DIR = Path(__file__).resolve().parent
+SKILL_DIR = SCRIPT_DIR.parent
+
 目标章节数 = 7
 章节最短秒 = 150
 切片长度 = (40, 95)      # 小红书切片的合理时长范围（秒）
@@ -46,6 +49,24 @@ from transcribe import apply_glossary, load_config, load_glossary
 拖尾词 = ("比如说", "就是", "因为", "但是", "然后", "所以", "的话", "一个")
 
 普通词表, 正则词表 = load_glossary(Path.cwd())
+
+
+def 解析风格(value, 期目录):
+    if value:
+        path = Path(value).expanduser()
+        if not path.is_absolute():
+            单集候选 = 期目录 / path
+            path = 单集候选 if 单集候选.exists() else Path.cwd() / path
+        if not path.is_file():
+            raise FileNotFoundError(f"找不到 Show Notes 风格文件：{path}")
+        return path.resolve()
+    candidates = (
+        期目录 / "show_notes_style.md",
+        期目录.parent / "show_notes_style.md",
+        Path.cwd() / "show_notes_style.md",
+        SKILL_DIR / "references" / "show-notes-style.md",
+    )
+    return next((path.resolve() for path in candidates if path.is_file()), None)
 
 
 def 读转写(path: Path):
@@ -223,6 +244,7 @@ def main():
     ap.add_argument("--成片稿", dest="final_transcript", help="明确指定剪辑后带时间戳逐字稿")
     ap.add_argument("--配置", dest="config", help="config.json 路径；相对路径按当前工作目录解析")
     ap.add_argument("--术语表", dest="glossary", help="glossary.json 路径；相对路径按当前工作目录解析")
+    ap.add_argument("--风格", dest="style", help="Show Notes 风格文件；默认读取工作区文件或 Skill 内置规则")
     ap.add_argument("--输出目录", dest="output_dir", help="输出目录；默认写入单集目录")
     ap.add_argument("-h", "--help", action="help", help="看用法")
     args = ap.parse_args()
@@ -258,6 +280,8 @@ def main():
     try:
         普通词表, 正则词表 = load_glossary(期目录.parent, args.glossary)
         config = load_config(期目录.parent, args.config)
+        风格路径 = 解析风格(args.style, 期目录)
+        风格文本 = 风格路径.read_text(encoding="utf-8") if 风格路径 else ""
     except (FileNotFoundError, json.JSONDecodeError) as exc:
         sys.exit(f"❌ {exc}")
 
@@ -272,6 +296,8 @@ def main():
 
     print(f"📄 用的是剪辑后的成片转写：{稿[0].name}（{len(句子)} 句，{时间(总长)}）")
     print("🔒 没有读取原始录音转写；输出内容只可能来自成片稿。")
+    if 风格路径:
+        print(f"🎨 Show Notes 风格：{风格路径.name}")
     if 术语修正:
         print(f"🔧 输出前重新应用术语表，共修正 {len(术语修正)} 处。")
 
@@ -318,11 +344,17 @@ def main():
     A(f"听众是{听众}。请帮我写这一期的 Show Notes。")
     A("")
     A("要求：")
-    A("1. 一段 100 字以内的简介，说清楚这期在聊什么、为什么值得听。不要用「本期我们探讨了」这种开头。")
-    A("2. 一份章节列表，用下面给出的时间点，每个配一句话标题。标题要具体，别写「关于成长」这种。")
-    A("3. 挑 3–5 句原话作为金句，必须一字不改地从稿子里抄，不要改写。")
-    A("4. 语气跟着稿子里两个人说话的方式走，不要写成公众号推文。")
+    A("1. 严格遵守后面的 Show Notes 风格指南，结构和固定尾巴不能缺。")
+    A("2. 开头从成片里的具体场景、词语或瞬间进入，不写通用主题摘要。")
+    A("3. 一份章节列表，只用下面给出的时间点。标题要具体，别写「关于成长」这种。")
+    A("4. 高光中的引语必须一字不改地从稿子里抄，不要改写。")
     A("5. 所有信息只能来自下面这份成片逐字稿，不补写稿子里没出现的内容。")
+    A("6. 成稿另存为 ShowNotes成稿.md，再运行 validate_show_notes.py 校验；不通过就重写。")
+    if 风格文本:
+        A("")
+        A("Show Notes 风格指南：")
+        A("")
+        A(风格文本)
     A("")
     A("已经切好的章节时间点（位置是准的，请直接用，不要自己另外估时间）：")
     for c in 章:
