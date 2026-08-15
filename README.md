@@ -6,6 +6,28 @@
 
 它不是三个互不相关的小工具。第一段建立可比对的数据，第二段从历史高低表现期提炼下一期的剪辑假设，第三段只服务之后的新内容。三段共享同一份成片时间轴，同时把“该删什么、该发什么”的最终判断留给人。
 
+## 作为 Codex Skill 一键安装
+
+在 Codex 中直接说：
+
+> 请安装这个 Skill：https://github.com/Juliejue/podcast-ai-workflow/tree/main/skills/podcast-ai-workflow
+
+也可以使用 Codex 自带的安装器：
+
+```bash
+python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --repo Juliejue/podcast-ai-workflow \
+  --path skills/podcast-ai-workflow
+```
+
+安装后，在下一轮对话中使用：
+
+```text
+用 $podcast-ai-workflow 处理这个播客文件夹：先检查现有素材，再做剪前/剪后转写、剪辑复盘或成片宣发。
+```
+
+Skill 会先检查环境。逐字稿对比和宣发只需要 Python 3.10+；本地转写和声波指标需要额外依赖。安装依赖和首次下载 Whisper 模型前，它会先征求同意。私有音频、逐字稿和配置始终留在使用者自己的工作区，不需要复制到 Skill 安装目录。
+
 ## 为什么做
 
 项目从三个连续需求长出来：
@@ -82,7 +104,7 @@ python3 tools/promo_materials.py episodes/ep05
 
 脚本不调用付费 API。输出附带可复制到任意大模型的 prompt，但标题、排序和发布决定仍由人完成。
 
-## 安装
+## 作为独立命令行工具安装
 
 需要 Python 3.10+。
 

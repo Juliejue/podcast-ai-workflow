@@ -34,3 +34,6 @@ performance_data.json
 !demo/*_ShowNotes素材*.md
 !demo/*_切片候选*.md
 !demo/**
+
+# Skill 内只放同一套人工匿名 demo，供安装后自检
+!skills/podcast-ai-workflow/assets/demo/**

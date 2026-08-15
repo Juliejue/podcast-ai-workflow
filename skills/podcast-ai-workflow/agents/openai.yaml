@@ -1,0 +1,4 @@
+interface:
+  display_name: "Podcast AI Workflow"
+  short_description: "剪前剪后转写、跨期剪辑复盘与成片宣发的一体化播客工作流"
+  default_prompt: "Use $podcast-ai-workflow to process this podcast folder from transcription through editing review and final-cut promotional materials."
